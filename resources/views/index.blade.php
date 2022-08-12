@@ -24,6 +24,7 @@
         {{-- <form id="addform"> --}}
 
             <div class="modal-body">
+                <input type="text" name="id" id="id">
                 <div class="form-group">
                     <label for="name">Name:</label>
                     <input type="text" class="form-control" name="name" id="name" placeholder="Enter your name">
@@ -43,7 +44,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button onclick="adddata();" type="button" class="btn btn-primary">Save student data</button>
+                <button onclick="adddata();" type="button" class="btn btn-primary">Add Student</button>
             </div>
         {{-- </form> --}}
       </div>
@@ -62,32 +63,36 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        {{-- <form id="addform"> --}}
+        <form id="studentedit">
+            {{ csrf_field() }}
+            {{ @method_field('PUT') }}
             
             <div class="modal-body">
-                
+                @foreach ($editstudent as $editstudent)
+                <input type="hidden" id="id" name="id" value={{ $editstudent->id }}>
                 <div class="form-group">
                     <label for="name">Name:</label>
-                    <input type="text" class="form-control" name="name" id="ename" placeholder="Enter your name">
+                    <input type="text" class="form-control" value={{ $editstudent->name }} name="name" id="editname">
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="email" class="form-control" name="email" id="eemail" placeholder="example@gmail.com">
+                    <input type="email" class="form-control" value={{ $editstudent->email }} name="email" id="editemail">
                 </div>
                 <div class="form-group">
                     <label for="phone">Phone:</label>
-                    <input type="text" class="form-control" name="phone"  id="ephone">
+                    <input type="text" class="form-control" value={{ $editstudent->phone }} name="phone"  id="editphone">
                 </div>
                 <div class="form-group">
                     <label for="course">Course:</label>
-                    <input type="text" class="form-control" name="course"  id="ecourse">
+                    <input type="text" class="form-control" value={{ $editstudent->course }} name="course"  id="editcourse">
                 </div>
+                @endforeach
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button onclick="adddata();" type="button" class="btn btn-primary">Save changes</button>
+                <button onclick="updatedata();" type="button" class="btn btn-primary">Update Data</button>
             </div>
-        {{-- </form> --}}
+        </form>
       </div>
     </div>
   </div>
@@ -124,8 +129,8 @@
                             <td>{{ $student->phone }}</td>
                             <td>{{ $student->course }}</td>
                             <td>
-                                <a href="{{ url('/index/edit/{id}') }}" onclick="return editdata();" class="btn btn-secondary editbtn">Edit</a>
-                                <a href="#" class="btn btn-danger editbtn">Delete</a>
+                                <a href="#" value="'+$student->id+'" onclick="return editdata({{ $student->id }});" class="btn btn-secondary editbtn">Edit</a>
+                                <a href="#" onclick="return deldata({{ $student->id }});" class="btn btn-danger deletebtn">Delete</a>
                             </td>
                         </tr>
                     @endforeach
@@ -137,20 +142,55 @@
 
 
     <script>
-        function editdata()
+        function editdata(id)
         {
-            $('#studenteditmodal').modal('show');
-            $tr = $(this).closest('tr');
-            var data=$tr.children('td').map(function(){
-                return $(this).text();
-            }).get();
-            consol.log(data);
-
-            $('#eid').val(data[0]);
-            $('#ename').val(data[1]);
-            $('#eemail').val(data[2]);
-            $('#ephone').val(data[3]);
-            $('#ecourse').val(data[4]);
+                $('#studenteditmodal').modal('show');
+            $.ajax({
+                type: "put",
+                url: "/index/edit/"+id,
+                data: {
+                    $('#editid').val(),
+                    $('#editname').val(),
+                    $('#editmail').val(),
+                    $('#editphone').val(),
+                    $('#editcourse').val(),
+                },
+                success: function (response) {
+                    console.log(response);
+                }
+            });
+        }
+        // function editdata(id)
+        // {
+        //     $('#studenteditmodal').modal('show');
+        //     $tr=$(this).closest('tr');
+        //     var data=$tr.children("td").map(function(){
+        //         return $(this).text();
+        //     }).get();
+        //     console.log(data);
+        //     $('#editid').val(data[0]);
+        //     $('#editname').val(data[1]);
+        //     $('#editemail').val(data[2]);
+        //     $('#editphone').val(data[3]);
+        //     $('#editcourse').val(data[4]);
+        // }
+    </script>
+    <script>
+        function deldata(id)
+        {
+            if(confirm("Do you want to delete this record"))
+            {
+                $.ajax({
+                    type: "delete",
+                    url: "/index/delete/"+id,
+                    data: {
+                        _token: $("input[name=_token]").val()
+                    },
+                    success: function (response) {
+                        $("#id"+id).remove();
+                    }
+                });
+            }
         }
     </script>
 

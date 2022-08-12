@@ -21,4 +21,5 @@ Route::get('/', function () {
 Route::view('/index','index');
 Route::post('/add',[StudentController::class,'store']);
 Route::get('/index',[StudentController::class,'show']);
-Route::get('/index/edit/{id}',[StudentController::class,'edit']);
+Route::delete('/index/delete/{id}',[StudentController::class,'destroy']);
+Route::get('index/edit/{id}',[StudentController::class,'edit']);

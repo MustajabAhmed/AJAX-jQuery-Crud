@@ -36,11 +36,18 @@ class StudentController extends Controller
         
         
     }
+    public function destroy($id)
+    {
+        $student=Student::find($id);
+        $student->delete();
+        return redirect('index');
+    }
     
     function edit($id,Student $student)
     {
         $editstudent=Student::find($id);
-        return view('index', ['student'=>$student]);
+        // return view('index', ['student'=>$editstudent]);
+        return view('index',compact('editstudent'));
 
     }
 }
